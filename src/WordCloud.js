@@ -6,6 +6,7 @@ import { scaleOrdinal } from 'd3-scale';
 import { schemeCategory10 } from 'd3-scale-chromatic';
 import { select } from 'd3-selection';
 
+import './WordCloud.css'
 
 const fill = scaleOrdinal(schemeCategory10);
 
@@ -92,7 +93,8 @@ class WordCloud extends Component {
           .text(d => d.text);
 
         if (onWordClick) {
-          texts.on('click', onWordClick);
+          texts.on('click', () => {
+          });
         }
         if (onWordMouseOver) {
           texts.on('mouseover', onWordMouseOver);
@@ -113,4 +115,3 @@ class WordCloud extends Component {
 }
 
 export default WordCloud;
-

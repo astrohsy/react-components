@@ -28,10 +28,12 @@ const data = sample.map((x) => { return { text: x, value: Math.floor(randomExpon
 class App extends Component {
 
     render() {
-        console.log(data);
+        const mouseOverAction = (e) => {
+            console.log(e);
+        }
         return (
             <div>
-                <WordCloud data={data} fontSizeMapper={fontSizeMapper} />
+                <WordCloud data={data} fontSizeMapper={fontSizeMapper} onWordMouseOver={mouseOverAction}/>
             </div>
         )
     }
