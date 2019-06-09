@@ -60,11 +60,12 @@ class WordCloud extends Component {
     .size([width, height])
     .words(data)
     .padding(10)
-    .font('Impact')
+    .font('Verdana')
     .fontSize(fontSizeMapper)
     .rotate(() => 0)
     .on('end', (cloudDimensions) => { this.setState({ cloudDimensions, isProcessing: false }); })
     .start();
+        
   }
 
   render() {
@@ -90,16 +91,21 @@ class WordCloud extends Component {
           <g transform={`translate(${width / 2},${height / 2})`}>
             {data.map((word, i) => {
               return (
+                <Tooltip  key={`${word.text}-${i}`}
+                          title={`${word.text} ${word.value}`}
+                          overlayStyle={{fontSize: '16px'}}>
                   <text
                     key={word.text}
                     style={{
                         fontSize: `${word.size}px`,
-                        fontFamily: 'Impact',
+                        fontFamily: 'Verdana',
                         fill: fill(i)
                     }}
                     textAnchor="middle"
                     transform={`translate(${word.x}, ${word.y})`}
                   >{word.text}</text>
+                </Tooltip>
+                  
               )
             }
                 
