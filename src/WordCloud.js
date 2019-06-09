@@ -1,10 +1,9 @@
 import PropTypes from 'prop-types';
-import ReactFauxDom from 'react-faux-dom';
 import cloud from 'd3-cloud';
-import { Component } from 'react';
+import React, { Component } from 'react';
 import { scaleOrdinal } from 'd3-scale';
 import { schemeCategory10 } from 'd3-scale-chromatic';
-import { select } from 'd3-selection';
+import { Tooltip, Popover } from 'antd';
 
 import './WordCloud.css'
 
@@ -40,8 +39,32 @@ class WordCloud extends Component {
     onWordMouseOut: null,
   };
 
+  state = {
+    cloudDimensions: [],
+    isProcessing: true
+  }
+
   componentWillMount() {
-    this.wordCloud = ReactFauxDom.createElement('div');
+    
+  }
+
+  componentDidMount() {
+    const {
+      data,
+      width,
+      height,
+      fontSizeMapper,
+    } = this.props;
+
+    this.wordCloud = cloud()
+    .size([width, height])
+    .words(data)
+    .padding(10)
+    .font('Impact')
+    .fontSize(fontSizeMapper)
+    .rotate(() => 0)
+    .on('end', (cloudDimensions) => { this.setState({ cloudDimensions, isProcessing: false }); })
+    .start();
   }
 
   render() {
@@ -58,59 +81,32 @@ class WordCloud extends Component {
       onWordMouseOut,
     } = this.props;
 
-    // clear old words
-    select(this.wordCloud)
-      .selectAll('*')
-      .remove();
+    if (this.state.isProcessing) {
+      return <span>Loading...</span>
+    }
 
-    // render based on new data
-    const layout = cloud()
-      .size([width, height])
-      .font('Impact')
-      .words(data)
-      .padding(padding)
-      .rotate(rotate)
-      .fontSize(fontSizeMapper)
-      .on('end', words => {
-        const texts = select(this.wordCloud)
-          .append('svg')
-          .attr('width', layout.size()[0])
-          .attr('height', layout.size()[1])
-          .append('g')
-          .attr(
-            'transform',
-            `translate(${layout.size()[0] / 2},${layout.size()[1] / 2})`
-          )
-          .selectAll('text')
-          .data(words)
-          .enter()
-          .append('text')
-          .style('font-size', d => `${d.size}px`)
-          .style('font-family', 'Impact')
-          .style('fill', (d, i) => fill(i))
-          .attr('text-anchor', 'middle')
-          .attr('transform', d => `translate(${[d.x, d.y]})rotate(${d.rotate})`)
-          .text(d => d.text);
-
-        if (onWordClick) {
-          texts.on('click', () => {
-          });
-        }
-        if (onWordMouseOver) {
-          texts.on('mouseover', onWordMouseOver);
-        }
-        if (onWordMouseOut) {
-          texts.on('mouseout', onWordMouseOut);
-        }
-      });
-
-    layout.start();
-
-    return this.wordCloud.toReact();
-  }
-
-  hoveringAction() {
-
+    return (
+      <svg width={width} height={height}>
+          <g transform={`translate(${width / 2},${height / 2})`}>
+            {data.map((word, i) => {
+              return (
+                  <text
+                    key={word.text}
+                    style={{
+                        fontSize: `${word.size}px`,
+                        fontFamily: 'Impact',
+                        fill: fill(i)
+                    }}
+                    textAnchor="middle"
+                    transform={`translate(${word.x}, ${word.y})`}
+                  >{word.text}</text>
+              )
+            }
+                
+            )}
+          </g>
+        </svg>
+    )
   }
 }
 

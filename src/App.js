@@ -1,6 +1,8 @@
 
 import React, {Component } from 'react';
 import WordCloud from './WordCloud';
+import { Tooltip } from 'antd';
+import 'antd/dist/antd.css';
 
   
 const sample = require('./data.json');
@@ -23,17 +25,22 @@ function randomExponential(rate, randomUniform) {
     return -Math.log(U)/rate;
   }
 
-const data = sample.map((x) => { return { text: x, value: Math.floor(randomExponential(0.15))}})
 
 class App extends Component {
+    state = {
+        tooltipVisible: false
+    }
 
+    mouseOverAction = (e) => {
+        this.setState({tooltipVisible: true});
+        console.log(e);
+    }
     render() {
-        const mouseOverAction = (e) => {
-            console.log(e);
-        }
+        const data = sample.map((x) => { return {text: x, value: Math.floor(randomExponential(0.15))}} )
+
         return (
             <div>
-                <WordCloud data={data} fontSizeMapper={fontSizeMapper} onWordMouseOver={mouseOverAction}/>
+                <WordCloud data={data} fontSizeMapper={fontSizeMapper} onWordMouseOver={this.mouseOverAction.bind(this)}/>
             </div>
         )
     }
